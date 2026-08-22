@@ -1,0 +1,273 @@
+# OpenSense source registry.
+#
+# STEP 0 (mandatory, from the hackathon rules): before building a collector for any source,
+# verify it is NOT covered by Bright Data's pre-built library:
+#   https://brightdata.com/cp/scrapers/browse
+# If a source is covered, replace it — custom scrapers for the long tail are the point.
+#
+# type: pdp | discovery | discovery_pdp | sitemap | search   (Scraper Studio scraper types)
+# kind: how OpenSense categorizes the rows (internship | hackathon | scholarship | bounty | event | job)
+#
+# collector_id: fill after `bdata scraper create` — the c_* id is the production endpoint.
+
+sources:
+  # ── Internships: the platform everyone uses — now inside the radar ──────────
+  - name: internshala-internships
+    kind: internship
+    type: discovery
+    seed_url: https://internshala.com/internships
+    collector_id: c_mt4fp37e1axygyx76t
+    field_map: {title: internship_title, url: internship_url, org: company_name,
+                location: location, stipend: stipend, deadline: apply_by}
+    verify_not_prebuilt: true
+
+  # ── Company career pages (internships / entry roles) ─────────────────────────
+  - name: zoho-careers
+    kind: internship
+    type: discovery
+    seed_url: https://www.zoho.com/careers/
+    collector_id: c_mt44uuwj2btvl18f65
+    field_map: {title: job_title, url: job_url, location: location}
+    verify_not_prebuilt: true
+
+  - name: freshworks-careers
+    kind: internship
+    type: discovery
+    seed_url: https://www.freshworks.com/company/careers/
+    collector_id: c_mt44v6e72osr3q6tlr
+    field_map: {title: job_title, url: job_url, location: location}
+    verify_not_prebuilt: true
+
+  - name: razorpay-careers
+    kind: job
+    type: discovery
+    seed_url: https://razorpay.com/jobs/
+    collector_id: c_mt44ysz61ycz5f2vgg
+    field_map: {title: job_title, url: job_url, location: location}
+    verify_not_prebuilt: true
+
+  - name: phonepe-careers
+    kind: job
+    type: discovery
+    seed_url: https://www.phonepe.com/careers/
+    collector_id: c_mt45ndoc1zmhp8k0jr
+    field_map: {title: job_title, url: job_url, location: location}
+    verify_not_prebuilt: true
+
+  - name: groww-careers
+    kind: job
+    type: discovery
+    seed_url: https://groww.in/careers
+    collector_id: c_mt45nfcf2ohykf9eoh
+    field_map: {title: job_title, url: job_url, location: location}
+    verify_not_prebuilt: true
+
+  # Swiggy: generation status poll_failed + CLI crashes on run (2026-08-22) — benched.
+  - name: swiggy-careers
+    kind: job
+    type: discovery
+    seed_url: https://www.swiggy.com/careers
+    enabled: false
+    collector_id: c_mt4b7yy51k8ozp03lc
+    field_map: {title: job_title, url: job_url, location: location}
+    verify_not_prebuilt: true
+
+  - name: postman-careers
+    kind: job
+    type: discovery
+    seed_url: https://www.postman.com/company/careers/
+    collector_id: c_mt4b7vlq2mvin7s5l
+    field_map: {title: job_title, url: job_url, location: location}
+    verify_not_prebuilt: true
+
+  # ── Tech events (Hasgeek: conferences/meetups, server-rendered) ──────────────
+  - name: hasgeek-events
+    kind: event
+    type: discovery
+    seed_url: https://hasgeek.com/
+    collector_id: c_mt4fp6m4xaywsfdex
+    field_map: {title: event_title, url: event_url}
+    verify_not_prebuilt: true
+
+  # ── Hackathons / community events (the long tail behind Devfolio/Unstop) ─────
+  - name: devfolio-hackathons
+    kind: hackathon
+    type: discovery
+    seed_url: https://devfolio.co/hackathons
+    collector_id: c_mt44yunc2kxqt4rkwx
+    field_map: {title: hackathon_title, url: hackathon_url, deadline: application_deadline}
+    verify_not_prebuilt: true
+
+  - name: mlh-season-events
+    kind: hackathon
+    type: discovery
+    seed_url: https://mlh.io/seasons/2026/events
+    collector_id: c_mt455hti2c7k6to8za
+    field_map: {title: event_name, url: event_url, deadline: event_dates, location: location}
+    verify_not_prebuilt: true
+
+  - name: wemakedevs-events
+    kind: event
+    type: sitemap
+    seed_url: https://www.wemakedevs.org/
+    collector_id: c_mt455xp5gua7pjsp4
+    field_map: {title: title, url: url, deadline: deadline}
+    verify_not_prebuilt: true
+
+  # ── Job aggregators (one source = thousands of companies' roles) ─────────────
+  - name: shine-jobs
+    kind: job
+    type: discovery
+    seed_url: https://www.shine.com/job-search/it-jobs
+    collector_id: c_mt4gouq12hve7kih5s
+    field_map: {title: job_title, url: job_url, org: company_name,
+                location: location, tags: experience_required}
+    verify_not_prebuilt: true
+
+  - name: freshersworld-jobs
+    kind: job
+    type: discovery
+    seed_url: https://www.freshersworld.com/jobs
+    collector_id: c_mt4fvivx24u24ikzwu
+    field_map: {title: job_title, url: job_url, org: company_name,
+                location: location, deadline: apply_by_date}
+    verify_not_prebuilt: true
+
+  # Foundit: benched 2026-08-22 — page defeats generated selectors (two builds +
+  # one heal all died on wait-selector timeouts: .srpResultCardContainer, .sourceLink).
+  # The event log keeps the full post-mortem; retry with a simpler listing URL someday.
+  - name: foundit-jobs
+    kind: job
+    type: discovery
+    seed_url: https://www.foundit.in/srp/results?query=internship
+    enabled: false
+    collector_id: c_mt4fp4vo24kffm1h05
+    field_map: {title: job_title, url: job_url, org: company_name,
+                location: location, tags: experience}
+    verify_not_prebuilt: true
+
+  # ── Hackathons: Unstop (the India student-events platform) + Devpost (global) ──
+  - name: unstop-hackathons
+    kind: hackathon
+    type: discovery
+    seed_url: https://unstop.com/hackathons
+    collector_id: c_mt4hyxu317v78e0gmy
+    field_map: {title: hackathon_title, url: hackathon_url,
+                deadline: registration_deadline, org: organizer_name, location: mode}
+    verify_not_prebuilt: true
+
+  - name: devpost-hackathons
+    kind: hackathon
+    type: discovery
+    seed_url: https://devpost.com/hackathons
+    collector_id: c_mt4hyzpph274spp8n
+    field_map: {title: title, url: url, deadline: submission_deadline, stipend: prizes}
+    verify_not_prebuilt: true
+
+  # ── Hackathons: HackerEarth (corporate + community) ──────────────────────────
+  - name: hackerearth-hackathons
+    kind: hackathon
+    type: discovery
+    seed_url: https://www.hackerearth.com/challenges/hackathon/
+    collector_id: c_mt4ihxgn1ib96ik622
+    field_map: {title: hackathon_title, url: hackathon_url, deadline: registration_deadline}
+    verify_not_prebuilt: true
+
+  # ── Hackathons: Reskilll (SSR-rich India aggregator) ─────────────────────────
+  - name: reskilll-hackathons
+    kind: hackathon
+    type: discovery
+    seed_url: https://www.reskilll.com/allHacks
+    collector_id: c_mt4g4upg1mks50he5n
+    field_map: {title: hackathon_title, url: hackathon_url, deadline: registration_deadline,
+                location: mode}
+    verify_not_prebuilt: true
+
+  # ── Hackathons: Techgig (Times Internet, corporate hackathons) ───────────────
+  - name: techgig-hackathons
+    kind: hackathon
+    type: discovery
+    seed_url: https://www.techgig.com/hackathons
+    collector_id: c_mt4g4wdt2n0kds1jfp
+    field_map: {title: hackathon_title, url: hackathon_url, deadline: registration_deadline}
+    verify_not_prebuilt: true
+
+  # ── Competitions (DrivenData: data-science for social good, server-rendered) ──
+  - name: drivendata-competitions
+    kind: bounty
+    type: discovery
+    seed_url: https://www.drivendata.org/competitions/
+    collector_id: c_mt4fp8clensybrwop
+    field_map: {title: competition_title, url: competition_url, deadline: deadline, stipend: prize}
+    verify_not_prebuilt: true
+
+  # ── Scholarships (WeMakeScholars: server-rendered, 26k+ database) ────────────
+  - name: wemakescholars-scholarships
+    kind: scholarship
+    type: discovery
+    seed_url: https://www.wemakescholars.com/scholarship
+    collector_id: c_mt4fwa5len2xgxn1v
+    field_map: {title: scholarship_name, url: scholarship_url, stipend: amount,
+                deadline: deadline, tags: eligibility}
+    verify_not_prebuilt: true
+
+  - name: buddy4study-scholarships
+    kind: scholarship
+    type: discovery
+    seed_url: https://buddy4study.com/scholarships
+    collector_id: c_mt4hdlbl10yxlih3kd
+    field_map: {title: scholarship_name, url: scholarship_url, stipend: amount,
+                deadline: deadline, tags: eligibility}
+    verify_not_prebuilt: true
+
+  - name: youthop-opportunities
+    kind: scholarship
+    type: discovery
+    seed_url: https://youthop.com/
+    field_map: {title: opportunity_title, url: opportunity_url,
+                deadline: deadline, location: country_region}
+    collector_id: c_mt4hdn8b29o71nsf2c
+    verify_not_prebuilt: true
+
+  # ── Scholarship foundation — generation errored twice (dynamic site); kept for the record.
+  # Swapping in a different foundation page is a 30-second edit + one create command.
+  - name: sitare-foundation
+    kind: scholarship
+    type: pdp
+    seed_url: https://sitare.org/
+    enabled: false             # AI generation status: error (2026-08-22)
+    collector_id: c_mt45jmko2ijeloah5s
+    field_map: {title: title, deadline: deadline, url: url}
+    verify_not_prebuilt: true
+
+  - name: template-foundation        # duplicate this block per verified foundation
+    kind: scholarship
+    type: pdp
+    seed_url: https://example-foundation.org/scholarships
+    enabled: false
+    collector_id: null
+    field_map: {title: title, deadline: last_date, url: url}
+    verify_not_prebuilt: true
+
+  # ── Bounties / competitions (public listing pages) ───────────────────────────
+  # Kaggle: listing-card URLs are JS-constructed; two collector builds + 1 heal all
+  # returned the same link for every row (2026-08-22) — benched rather than ship wrong links.
+  - name: kaggle-competitions
+    kind: bounty
+    type: discovery
+    seed_url: https://www.kaggle.com/competitions
+    enabled: false
+    collector_id: c_mt45m3qg4jngbkeun
+    field_map: {title: title, url: url, deadline: deadline}
+    verify_not_prebuilt: true
+
+# Target: 15–25 heterogeneous live sources before submission.
+# Every block you enable MUST have a collector_id and MUST have passed the Step-0 library check.
+
+# Deadline enrichment: listing cards don't show deadlines, detail pages do.
+# One PDP collector, batch-triggered with the newest deadline-less listings each run.
+enrichment:
+  collector_id: c_mt4b7xa74eyt2c99i   # opensense-hackathon-detail (PDP type)
+  kinds: [hackathon, event]
+  url_patterns: [devfolio.co]          # the detail collector is built for these pages
+

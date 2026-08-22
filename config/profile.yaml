@@ -1,0 +1,9 @@
+# Who the digest is for. Edit freely — this is read by pipeline/match.py.
+# Keep it short and concrete; it also becomes the "paste a 2-line bio" moment in the demo.
+
+skills: [python, react, web scraping, llm]
+roles: [intern, sde intern, junior developer, data]
+locations: [remote, bangalore, india]
+interests: [hackathon, open source]
+min_match_score: 1        # listings scoring below this are not alerted, only listed
+top_n_digest: 10          # how many ranked hits the digest shows

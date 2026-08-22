@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sunrise Foundation Scholarships</title>
+<!--
+  SELF-HEAL DEMO TARGET — host this on GitHub Pages, build a collector against it,
+  then break it on camera:
+    1. rename class "sch-title"   → "sch-heading"      (title extraction breaks)
+    2. or move .sch-deadline one  <div> deeper          (deadline extraction breaks)
+  3. film: bdata scraper heal c_xxx "title field returns empty; the heading now uses
+     class sch-heading" → approve → re-run → same Collector ID, rows return.
+  The heal + recovery become events on the OpenSense timeline automatically.
+-->
+<style>
+  body{font:16px/1.6 system-ui;max-width:720px;margin:40px auto;padding:0 20px;color:#222}
+  h1{border-bottom:2px solid #e3542f;padding-bottom:8px}
+  .sch{border:1px solid #ddd;border-radius:8px;padding:14px 18px;margin:14px 0}
+  .sch-title{font-weight:700;font-size:18px}
+  .sch-deadline{color:#b3541e}
+</style>
+</head>
+<body>
+<h1>Sunrise Foundation — Scholarships</h1>
+
+<div class="sch">
+  <div class="sch-title">Sunrise Merit Scholarship 2026</div>
+  <div>For undergraduate students in India with family income below ₹6L.</div>
+  <div class="sch-deadline">Last date: 15 September 2026</div>
+  <a href="https://example.org/apply-merit">Apply</a>
+</div>
+
+<div class="sch">
+  <div class="sch-title">Sunrise Women in STEM Grant</div>
+  <div>₹1,00,000 per year for women pursuing engineering degrees.</div>
+  <div class="sch-deadline">Last date: 30 September 2026</div>
+  <a href="https://example.org/apply-wstem">Apply</a>
+</div>
+
+<div class="sch">
+  <div class="sch-title">Sunrise Research Fellowship</div>
+  <div>Short-term research stipend for final-year students.</div>
+  <div class="sch-deadline">Last date: 10 October 2026</div>
+  <a href="https://example.org/apply-fellowship">Apply</a>
+</div>
+</body>
+</html>

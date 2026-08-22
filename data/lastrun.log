@@ -1,0 +1,59 @@
+[ok]   razorpay-careers: 25 raw → 25 rows
+[ok]   freshworks-careers: 4 raw → 3 rows
+[ok]   internshala-internships: 50 raw → 50 rows
+[ok]   zoho-careers: 1 raw → 1 rows
+[ok]   groww-careers: 1 raw → 5 rows
+[ok]   phonepe-careers: 68 raw → 67 rows
+[ok]   mlh-season-events: 1 raw → 1 rows
+[ok]   hasgeek-events: 21 raw → 17 rows
+[ok]   wemakedevs-events: 15 raw → 10 rows
+[ok]   freshersworld-jobs: 1 raw → 20 rows
+[ok]   devfolio-hackathons: 29 raw → 29 rows
+[ok]   unstop-hackathons: 18 raw → 18 rows
+[ok]   postman-careers: 114 raw → 113 rows
+[ok]   hackerearth-hackathons: 1 raw → 2 rows
+[fail] shine-jobs: collector c_mt4gouq12hve7kih5s run j_mt4krayi2hrpxhpq68 not ready in 900s
+[fail] devpost-hackathons: collector c_mt4hyzpph274spp8n run j_mt4ks7jw1qnv9oza8a not ready in 900s
+[ok]   reskilll-hackathons: 2 raw → 5 rows
+[fail] techgig-hackathons: collector c_mt4g4wdt2n0kds1jfp run j_mt4kx74a11hufcrrk not ready in 900s
+[ok]   wemakescholars-scholarships: 19 raw → 19 rows
+[ok]   youthop-opportunities: 1 raw → 18 rows
+[ok]   drivendata-competitions: 11 raw → 11 rows
+[ok]   buddy4study-scholarships: 10 raw → 106 rows
+
+--- digest (TELEGRAM_* not set, printing only) ---
+📡 OpenSense radar
+579 live listings (14 bounty · 27 event · 57 hackathon · 49 internship · 370 job · 62 scholarship)
+82 new · 18 close this week · 0 starred changes
+
+⏰ CLOSING THIS WEEK
+• Luxury Connect Business School Scholarship Program 2026-27 (MBA in Luxury Brand Management) (4d)
+• Engineer (0d)
+• Field Sales Executi (0d)
+• Associate - Sales (0d)
+• Electrical Engineer (0d)
+• Business Developmen (0d)
+
+🎯 TOP MATCHES
+• Data Operations — Smollan India · closes in 14d · match 4
+  https://internshala.com/internship/detail/work-from-home-data-operations-internship-at-smollan-india1786019561
+• Data Analytics — Bestdesk IT Solutions Private Limited · closes in 15d · match 4
+  https://internshala.com/internship/detail/data-analytics-internship-in-jaipur-at-bestdesk-it-solutions-private-limited1786091990
+• Web Scraping — Smollan India · closes in 20d · match 4
+  https://internshala.com/internship/detail/work-from-home-web-scraping-internship-at-smollan-india1786527587
+• Data Analytics — Basti Ki Pathshala Foundation · closes in 29d · match 4
+  https://internshala.com/internship/detail/work-from-home-data-analytics-internship-at-basti-ki-pathshala-foundation1787308383
+• Senior Data Scientist (Python) — Proxify · match 4
+  https://www.workingnomads.com/job/go/1773159/
+• Senior Data Engineer (Python) — Proxify · match 4
+  https://www.workingnomads.com/job/go/1773153/
+• GEV Memorial Merit Scholarship 2026-27 for Law Students — Buddy4Study Scholarships · match 3
+  https://buddy4study.com/scholarships
+• Content Writing — Tech Burner · closes in 14d · match 3
+  https://internshala.com/internship/detail/content-writing-internship-in-bangalore-at-tech-burner1785981749
+• Field Sales — VitaminBe · closes in 18d · match 3
+  https://internshala.com/internship/detail/part-time-field-sales-internship-in-bangalore-at-vitaminbe1786345594
+• Media & Public Relations (PR) — Madison Public Relations · closes in 19d · match 3
+  https://internshala.com/internship/detail/media-public-relations-pr-internship-in-bangalore-at-madison-public-relations1786430025
+
+{'new': 82, 'removed': 36, 'changed': 0, 'closing_this_week': 18, 'starred_changed': 0, 'starred_live': 0, 'total_live': 579}

@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0e14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<title>OpenSense — opportunity radar</title>
+<style>
+  :root{--bg:#0b0e14;--card:#141926;--line:#232b3d;--ink:#dbe4f3;--dim:#7b8aa5;
+        --acc:#4f8cff;--good:#3ecf8e;--warn:#ffb454;--bad:#ff6b6b}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,Roboto,sans-serif;padding:20px;padding-bottom:env(safe-area-inset-bottom)}
+  h1{font-size:21px;letter-spacing:.3px} h1 span{color:var(--acc)}
+  .sub{color:var(--dim);margin:4px 0 16px;font-size:13.5px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .card b{font-size:24px;display:block} .card span{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+  .card.wide{grid-column:span 2}
+  .card.wide b{font-size:14px;line-height:1.45;text-transform:none;letter-spacing:0}
+  @media(max-width:860px){.card.wide{grid-column:auto}}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .bar{position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  #q{flex:1;min-width:170px;max-width:420px;background:var(--card);border:1px solid var(--line);
+     border-radius:99px;color:var(--ink);padding:7px 14px;font-size:13.5px;outline:none}
+  #q:focus{border-color:var(--acc)}
+  #sort{background:var(--card);border:1px solid var(--line);border-radius:99px;color:var(--dim);
+        padding:7px 12px;font-size:13px;outline:none;cursor:pointer}
+  #count{color:var(--dim);font-size:12px;white-space:nowrap}
+  .chip{border:1px solid var(--line);background:var(--card);color:var(--dim);border-radius:99px;
+        padding:5px 14px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .chip.on{color:var(--acc);border-color:var(--acc)}
+  .gear{margin-left:auto;border-color:var(--acc);color:var(--acc)!important}
+  .cols{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+  @media(max-width:860px){.cols{grid-template-columns:1fr}body{padding:12px}}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:13.5px}
+  th{color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.6px}
+  tr:last-child td{border-bottom:none} tr.row{cursor:pointer}
+  @media(max-width:860px){.hide-sm{display:none}}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  .pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;border:1px solid var(--line)}
+  .pill.kind{color:var(--acc)} .pill.soon{color:var(--warn);border-color:var(--warn)}
+  .pill.today{color:var(--bad);border-color:var(--bad)} .pill.new{color:var(--good);border-color:var(--good)}
+  .pill.path{color:var(--good);border-color:var(--good);background:rgba(62,207,142,.08)}
+  .match{color:var(--good);font-weight:600}
+  .star{cursor:pointer;user-select:none;font-size:16px;opacity:.35;-webkit-tap-highlight-color:transparent}
+  .star.on{opacity:1}
+  .feed{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 0;max-height:70vh;overflow:auto}
+  .feed h2{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;padding:10px 16px 6px}
+  .ev{display:flex;gap:10px;padding:7px 16px;font-size:12.5px}
+  .ev .t{color:var(--dim);min-width:56px;font-variant-numeric:tabular-nums}
+  .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none;background:var(--acc)}
+  .ev.fail .dot{background:var(--bad)} .ev.heal .dot,.ev.enrich .dot{background:var(--good)}
+  .ev small{color:var(--dim);display:block}
+  .modal-bg{position:fixed;inset:0;background:rgba(5,8,14,.72);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+  .modal{background:var(--card);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;
+         max-height:85vh;overflow:auto;padding:18px 20px}
+  .modal h3{margin-bottom:2px} .modal .kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;margin:14px 0;font-size:13px}
+  .modal .kv b{color:var(--dim);font-weight:500}
+  .modal .mono{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--good);word-break:break-all}
+  .modal h4{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 6px}
+  .close{float:right;cursor:pointer;color:var(--dim);font-size:20px;background:none;border:none}
+  /* personalization */
+  .pgrid{display:grid;gap:14px;margin-top:12px}
+  .pgrid label{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:6px}
+  .tagrow{display:flex;gap:6px;flex-wrap:wrap}
+  .tag{border:1px solid var(--line);background:var(--bg);color:var(--dim);border-radius:99px;padding:4px 12px;font-size:13px;cursor:pointer}
+  .tag.on{color:var(--acc);border-color:var(--acc)}
+  input[type=text]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;
+        color:var(--ink);padding:8px 10px;font-size:14px}
+  .btn{border:1px solid var(--acc);background:var(--acc);color:#fff;border-radius:8px;padding:8px 16px;
+       font-size:14px;cursor:pointer;margin-top:6px}
+  .btn.ghost{background:none;color:var(--acc)}
+  .note{font-size:12px;color:var(--dim);margin-top:8px}
+  #banner{position:fixed;left:0;right:0;bottom:0;background:#3a1f2b;color:#ffd7d7;border-top:1px solid var(--bad);
+          padding:8px 16px;font-size:13px;display:none;z-index:50;gap:10px;align-items:center}
+  #banner button{margin-left:auto;background:none;border:1px solid var(--bad);color:#ffd7d7;
+          border-radius:6px;padding:3px 10px;cursor:pointer}
+  #toast{position:fixed;bottom:52px;left:50%;transform:translateX(-50%);background:var(--card);
+         border:1px solid var(--warn);color:var(--warn);border-radius:8px;padding:8px 14px;font-size:13px;
+         display:none;z-index:51}
+  #nudge{background:rgba(79,140,255,.08);border:1px dashed var(--acc);border-radius:12px;
+         padding:10px 14px;margin-bottom:14px;font-size:13.5px;display:none;gap:10px;align-items:center}
+  #nudge button{margin-left:auto}
+</style>
+</head>
+<body>
+<h1>📡 Open<span>Sense</span></h1>
+<p class="sub">self-healing radar for the long tail of student opportunities · every row traceable to its collector run · <span id="runage">—</span></p>
+
+<div id="nudge">🎯 Make this radar yours — pick what you're looking for (saved in this browser, no login).<button class="btn ghost" onclick="openPersonalize()">Personalize</button><button class="btn ghost" onclick="dismissNudge()">Later</button></div>
+
+<div class="cards" id="cards"></div>
+<div class="bar">
+  <div class="chips" id="chips"></div>
+  <div class="controls">
+    <input id="q" type="text" placeholder="🔍 search title, org, location, skill…" autocomplete="off">
+    <select id="sort">
+      <option value="relevance">sort: relevance</option>
+      <option value="deadline">sort: deadline</option>
+      <option value="newest">sort: newest</option>
+    </select>
+    <span id="count"></span>
+  </div>
+</div>
+
+<div class="cols">
+  <div>
+    <table>
+      <thead><tr><th></th><th>listing</th><th class="hide-sm">kind</th><th>deadline</th><th>match</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <div class="feed">
+    <h2>event log — append-only</h2>
+    <div id="events"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
+
+<div id="banner"><span id="bannerText"></span><button onclick="location.reload()">Retry</button></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+const $=q=>document.querySelector(q);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=ts=>new Date(ts*1000).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+const daysLeft=d=>d?Math.round((new Date(d)-Date.now())/864e5):null;
+const API=location.protocol.startsWith('http');
+const KINDS=['job','internship','hackathon','bounty','scholarship','event'];
+const PROFILE_KEY='opensense.profile.v1', NUDGE_KEY='opensense.nudge.dismissed';
+
+let LISTINGS=[], STARS=new Set(), FILTER='all', PROFILE=null, QUERY='', SORT='relevance';
+const storage=(()=>{  // localStorage can be unavailable (private mode) — degrade to memory
+  try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return localStorage; }
+  catch(_){ const m={}; return {getItem:k=>m[k]??null,setItem:(k,v)=>m[k]=String(v),removeItem:k=>delete m[k]}; }
+})();
+
+window.addEventListener('error',e=>showBanner('Something broke while rendering: '+e.message));
+window.addEventListener('unhandledrejection',e=>showBanner('A background step failed: '+(e.reason&&e.reason.message||e.reason)));
+function showBanner(msg){ $('#bannerText').textContent=msg; $('#banner').style.display='flex'; }
+let toastTimer=null;
+function toast(msg){ $('#toast').textContent=msg; $('#toast').style.display='block';
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('#toast').style.display='none',3500); }
+
+async function fetchSafe(url, tries=2){
+  for(let i=0;i<tries;i++){
+    try{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }
+    catch(e){ if(i===tries-1) throw e; await new Promise(r2=>setTimeout(r2,800*(i+1))); }
+  }
+}
+const parseJsonl=t=>t.trim().split('\n').filter(Boolean).map(l=>{try{return JSON.parse(l)}catch(_){return null}}).filter(Boolean);
+
+// ── profile (localStorage, never expires until edited in the tab) ────────────
+function loadProfile(){
+  try{ PROFILE=JSON.parse(storage.getItem(PROFILE_KEY)||'null'); }catch(_){ PROFILE=null; }
+  return PROFILE;
+}
+function saveProfile(p){ PROFILE=p; storage.setItem(PROFILE_KEY, JSON.stringify(p)); }
+function clientScore(l,p){
+  const text=(l.title+' '+(l.location||'')+' '+(l.tags||[]).join(' ')+' '+l.kind).toLowerCase();
+  let hits=0;
+  (p.skills||[]).forEach(s=>{ if(text.includes(s.toLowerCase())) hits+=2; });
+  (p.roles||[]).forEach(s=>{ if(text.includes(s.toLowerCase())) hits+=2; });
+  (p.locations||[]).forEach(s=>{ if(text.includes(s.toLowerCase())) hits+=1; });
+  const wantsWork=!(p.kinds||[]).length || p.kinds.some(k=>k==='job'||k==='internship');
+  if(l.pathway && wantsWork) hits+=3;
+  return hits;
+}
+function parseGoalClient(text){
+  const t=text||'', adj={};
+  const kinds=[];
+  if(/\bjobs?\b|full[- ]?time|placement|hiring/i.test(t)) kinds.push('job');
+  if(/intern/i.test(t)) kinds.push('internship');
+  if(/hackathon/i.test(t)) kinds.push('hackathon');
+  if(/competitions?\b|challenges?\b|contests?\b/i.test(t)) kinds.push('bounty');
+  if(/scholarship|fellowship|grant/i.test(t)) kinds.push('scholarship');
+  if(/\bevents?\b|meetup|conference|workshop/i.test(t)) kinds.push('event');
+  if(/leads?\s+to\s+(jobs?|intern)|get\s+(hired|a\s+job)|ppo|placement/i.test(t))
+    kinds.push('hackathon','bounty');
+  if(/(first|1st|second|2nd|third|3rd|fourth|4th|final)\s+year|\byear\s*[1-4]\b/i.test(t)){
+    if(!kinds.length) kinds.push('internship','hackathon','bounty','scholarship');
+  }
+  if(/remote|work\s+from\s+home|wfh/i.test(t)) adj.locations=['remote'];
+  if(kinds.length) adj.kinds=[...new Set(kinds)];
+  return adj;
+}
+function profileKinds(){ return (PROFILE&&PROFILE.kinds&&PROFILE.kinds.length)?PROFILE.kinds:null; }
+
+// ── boot ─────────────────────────────────────────────────────────────────────
+Promise.allSettled([
+  fetchSafe('../data/latest.json'),
+  fetch('../data/events.jsonl',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}),
+  API?fetchSafe('/api/stars'):Promise.resolve({}),
+  API?fetchSafe('/api/trends'):Promise.resolve(null)
+]).then(([dataR, logR, starsR, trendsR])=>{
+  if(dataR.status==='rejected'){ showBanner('Could not load radar data — is the pipeline run yet?'); }
+  const data=dataR.status==='fulfilled'?dataR.value:null;
+  const logText=logR.status==='fulfilled'?String(logR.value||''):'';
+  const stars=starsR.status==='fulfilled'?starsR.value:{};
+  if(!data&&!logText){ return; }
+  STARS=new Set(Object.keys(stars||{}));
+  LISTINGS=(data&&data.listings||[]).filter(l=>l&&l.title);   // malformed-row guard
+  loadProfile();
+  if(!storage.getItem(NUDGE_KEY) && !PROFILE) $('#nudge').style.display='flex';
+
+  const evts=parseJsonl(logText);
+  const runTs=evts.length?evts[evts.length-1].ts:null;
+  $('#runage').textContent=runTs?`last run ${age(runTs)}`:'';
+  const heals=evts.filter(e=>e.kind==='heal').length, enrichs=evts.filter(e=>e.kind==='enrich').length;
+  const s=(data&&data.summary)||{};
+  const srcs=new Set(LISTINGS.map(l=>String(l.source).split(', ')[0]));
+
+  const tr=trendsR.status==='fulfilled'?trendsR.value:null;
+  let trendCard='';
+  if(tr&&tr.daily){
+    const pts=tr.daily.new_per_day||[];
+    trendCard=`<div class="card wide"><b>${esc(tr.signal||'')}</b>
+      <span>new listings per day · last ${pts.length} days</span>${sparkSVG(pts)}</div>`;
+  }
+
+  $('#cards').innerHTML=[
+    ['live listings',s.total_live??LISTINGS.length],
+    ['sources live',srcs.size],
+    ['new since last run',s.new??'—'],
+    ['closing this week',s.closing_this_week??'—'],
+    ['⭐ starred',LISTINGS.filter(l=>STARS.has(l.id)).length],
+    ['heals / enrich',`${heals} / ${enrichs}`]
+  ].map(([k,v])=>`<div class="card"><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join('')
+    +trendCard;
+
+  applyProfileRanking(); renderChips(); render(); renderFeed(evts);
+}).catch(err=>showBanner('Unexpected init failure: '+err.message));
+
+function sparkSVG(vals){
+  // tiny hand-built sparkline — no libraries, just a polyline scaled into view
+  const w=230,h=34,max=Math.max(1,...vals),n=vals.length;
+  if(!n) return '';
+  const step=n>1?w/(n-1):0;
+  const pts=vals.map((v,i)=>[i*step,h-3-(v/max)*(h-8)]);
+  const line=pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  const last=pts[pts.length-1];
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none"
+    style="margin-top:6px;display:block" role="img" aria-label="new listings per day">
+    <polyline fill="none" stroke="var(--acc)" stroke-width="2" stroke-linejoin="round" points="${line}"/>
+    ${last?`<circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.5" fill="var(--acc)"/>`:''}
+  </svg>`;
+}
+
+function age(ts){const m=Math.round((Date.now()/1000-ts)/60);return m<90?m+'m ago':Math.round(m/60)+'h ago'}
+function isFresh(iso){return iso&&(Date.now()-new Date(iso))/36e5<24}
+function applyProfileRanking(){
+  if(!PROFILE) return;
+  LISTINGS.forEach(l=>l.match=clientScore(l,PROFILE));
+  LISTINGS.sort((a,b)=>(b.match||0)-(a.match||0));
+}
+
+// ── filters + table ──────────────────────────────────────────────────────────
+function renderChips(){
+  const kinds=profileKinds()||[...new Set(LISTINGS.map(l=>l.kind))];
+  const all=['all','⭐ starred','⏰ closing',...kinds];
+  $('#chips').innerHTML=all.map(c=>`<button class="chip ${c===FILTER?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')
+    +`<button class="chip gear" onclick="openPersonalize()">⚙️ personalize${PROFILE?' ●':''}</button>`;
+  document.querySelectorAll('.chip[data-c]').forEach(b=>b.onclick=()=>{FILTER=b.dataset.c;renderChips();render();});
+}
+// search + sort controls (debounced so typing stays smooth on phones)
+let qTimer=null;
+$('#q').addEventListener('input',e=>{
+  clearTimeout(qTimer);
+  qTimer=setTimeout(()=>{QUERY=e.target.value.trim().toLowerCase();render();},150);
+});
+$('#sort').addEventListener('change',e=>{SORT=e.target.value;render();});
+function visible(){
+  const pk=profileKinds();
+  return LISTINGS.filter(l=>{
+    if(QUERY){
+      const q=QUERY.split(/\s+/).filter(Boolean);
+      const hay=(l.title+' '+(l.org||'')+' '+(l.location||'')+' '+l.kind+' '+(l.tags||[]).join(' ')).toLowerCase();
+      if(!q.every(t=>hay.includes(t))) return false;
+    }
+    if(FILTER==='⭐ starred')return STARS.has(l.id);
+    if(FILTER==='⏰ closing'){const d=daysLeft(l.deadline);return d!==null&&d>=0&&d<=7}
+    if(FILTER==='all')return !pk||pk.includes(l.kind);
+    return l.kind===FILTER;
+  });
+}
+function sortedRows(vis){
+  if(SORT==='deadline') return vis.slice().sort((a,b)=>{
+    const da=daysLeft(a.deadline),db=daysLeft(b.deadline);
+    if(da===null&&db===null)return 0; if(da===null)return 1; if(db===null)return -1;
+    return da-db;
+  });
+  if(SORT==='newest') return vis.slice().sort((a,b)=>
+    new Date(b.first_seen||0)-new Date(a.first_seen||0));
+  return vis;
+}
+function render(){
+  const newIds=new Set(LISTINGS.filter(l=>isFresh(l.first_seen)).map(l=>l.id));
+  const vis=visible();
+  $('#count').textContent=vis.length===LISTINGS.length
+    ?`${LISTINGS.length} listings`:`${vis.length} of ${LISTINGS.length}`;
+  $('#rows').innerHTML=sortedRows(vis).slice(0,80).map(l=>{
+    const dl=daysLeft(l.deadline);
+    const pill=dl===null||dl<0?'':dl===0?'<span class="pill today">today</span>':dl<=7?`<span class="pill soon">${dl}d</span>`:'';
+    return `<tr class="row" data-id="${esc(l.id)}">
+      <td><span class="star ${STARS.has(l.id)?'on':''}" data-star="${esc(l.id)}">${STARS.has(l.id)?'★':'☆'}</span></td>
+      <td><a href="${esc(l.url||'#')}" target="_blank" rel="noopener noreferrer">${esc(l.title)}</a>
+          <small style="color:var(--dim)">${esc(l.org)} · ${esc(l.source)}</small>
+          ${newIds.has(l.id)?'<span class="pill new">new</span>':''}
+          ${l.pathway?'<span class="pill path" title="prizes include a job/internship">→ job</span>':''}</td>
+      <td class="hide-sm"><span class="pill kind">${esc(l.kind)}</span></td>
+      <td>${esc(l.deadline||'—')} ${pill}</td>
+      <td class="match">${l.match??''}</td></tr>`;
+  }).join('')||'<tr><td colspan="5" style="color:var(--dim)">nothing matches this filter yet</td></tr>';
+  document.querySelectorAll('.star').forEach(el=>el.onclick=e=>{e.stopPropagation();toggleStar(el.dataset.star)});
+  document.querySelectorAll('tr.row').forEach(tr=>tr.onclick=()=>openModal(tr.dataset.id));
+}
+async function toggleStar(id){
+  if(!API){toast('Star syncing needs served mode: python -m pipeline serve');return}
+  try{
+    const r=await fetch('/api/star/'+encodeURIComponent(id),{method:'POST'});
+    const {starred}=await r.json();
+    starred?STARS.add(id):STARS.delete(id);
+  }catch(_){ toast('Server unreachable — star saved locally for now'); STARS.add(id); }
+  render();
+}
+function renderFeed(evts){
+  $('#events').innerHTML=evts.slice(-120).reverse().map(e=>{
+    const d=e.detail||{};
+    const txt={
+      run_start:`run started — ${d.sources??'?'} sources`,
+      source_trigger:`trigger ${e.source}`,
+      source_result:`${e.source}: ${d.raw_rows??'?'} raw → ${d.normalized??'?'} rows`,
+      source_fail:`${e.source} failed — quarantined <small>${esc(d.error||'')}</small>`,
+      dedup:`dedup ${d.raw??'?'} → ${d.unique??'?'} unique`,
+      enrich:`deadline enrichment: ${d.filled??0}/${d.targets??0} filled`,
+      delta:`Δ ${d.new??0} new · ${d.closing_this_week??0} closing`,
+      heal:`self-heal on ${e.source} (${d.trigger||'manual'}) — collector id unchanged`,
+      alert: d.trigger==='bodyguard' ? `⭐ bodyguard: ${d.pings??1} deadline ping(s) sent`
+        : d.trigger==='watch' ? `👀 watch '${d.keyword}' fired — ${d.hits??'?'} new`
+        : `digest delivered (${d.channel||'—'})`,
+      bot: d.op==='auth_reject' ? `🔒 unknown sender rejected (not an admin)`
+        : `bot: ${d.op||''}`,
+      source_op: `source op: ${d.op||''} ${d.status||''} ${d.url?String(d.url).split('/')[2]||'':''}`,
+      profile_update:`profile updated — digest uses it from next run`,
+      run_end:`run complete — ${d.total_live??'?'} live`
+    }[e.kind]||e.kind;
+    return `<div class="ev ${e.kind==='source_fail'?'fail':''}${(e.kind==='heal'||e.kind==='enrich')?'heal':''}">
+      <span class="t">${fmt(e.ts)}</span><span class="dot"></span><div>${txt}</div></div>`;
+  }).join('')||'<div class="ev"><div style="color:var(--dim)">no events yet</div></div>';
+}
+
+// ── lineage modal ────────────────────────────────────────────────────────────
+async function openModal(id){
+  const l=LISTINGS.find(x=>x.id===id); if(!l)return;
+  const m=$('#modal');
+  let lineage='';
+  if(API){
+    try{
+      const evs=await fetchSafe('/api/events?source='+encodeURIComponent(String(l.source).split(',')[0]));
+      lineage=evs.slice(0,6).map(e=>`<div class="ev"><span class="t">${fmt(e.ts)}</span><span class="dot" style="background:${e.kind==='source_fail'?'var(--bad)':'var(--acc)'}"></span><div>${esc(e.kind)} — ${esc(e.status||'')}</div></div>`).join('');
+    }catch(_){ lineage='<div style="color:var(--dim);font-size:13px">lineage unavailable (server unreachable)</div>'; }
+  }
+  m.innerHTML=`<button class="close" onclick="closeModal()">×</button>
+    <h3>${esc(l.title)}</h3>
+    <a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.url)}</a>
+    <div class="kv">
+      <b>org</b><div>${esc(l.org)}</div>
+      <b>kind</b><div>${esc(l.kind)}${l.pathway?' <span class="pill path">→ job</span>':''}</div>
+      <b>location</b><div>${esc(l.location||'—')}</div>
+      <b>deadline</b><div>${esc(l.deadline||'—')}</div>
+      <b>match score</b><div>${esc(l.match??'—')}</div>
+      <b>source(s)</b><div>${esc(l.source)}</div>
+      <b>first seen</b><div>${esc(l.first_seen||'—')}</div>
+    </div>
+    <h4>lineage — runs that produced this row</h4>
+    ${lineage||'<div style="color:var(--dim);font-size:13px">serve with <code>python -m pipeline serve</code> for live lineage</div>'}`;
+  $('#modalBg').style.display='flex';
+}
+function closeModal(){ $('#modalBg').style.display='none'; }
+$('#modalBg').onclick=e=>{if(e.target.id==='modalBg')closeModal()};
+
+// ── personalize tab ──────────────────────────────────────────────────────────
+function openPersonalize(){
+  const p=PROFILE||{};
+  const sel=new Set(p.kinds||[]);
+  $('#modal').innerHTML=`<button class="close" onclick="closeModal()">×</button>
+    <h3>⚙️ Personalize</h3>
+    <div class="note">Saved in this browser only — no login. Applies instantly; never expires until you change it here.</div>
+    <div class="pgrid">
+      <div><label>what are you looking for?</label>
+        <div class="tagrow" id="pKinds">${KINDS.map(k=>`<span class="tag ${sel.has(k)?'on':''}" data-k="${k}">${k}</span>`).join('')}</div></div>
+      <div><label>skills (comma separated)</label>
+        <input type="text" id="pSkills" value="${esc((p.skills||[]).join(', '))}" placeholder="python, react, web scraping"></div>
+      <div><label>locations</label>
+        <input type="text" id="pLocs" value="${esc((p.locations||[]).join(', '))}" placeholder="remote, bangalore, india"></div>
+      <div><label>describe your goal (optional)</label>
+        <input type="text" id="pGoal" value="${esc(p.goal||'')}" placeholder="2nd year, only internships — or: competitions that lead to jobs"></div>
+    </div>
+    <button class="btn" onclick="savePersonalize(true)">Save</button>
+    <button class="btn ghost" onclick="savePersonalize(true,true)">Save + use for my digest</button>
+    <button class="btn ghost" onclick="resetPersonalize()">Reset</button>
+    <div class="note">"use for my digest" sends this to the server — the next pipeline run's Telegram alert matches it.</div>`;
+  document.querySelectorAll('#pKinds .tag').forEach(t=>t.onclick=()=>{t.classList.toggle('on');});
+  $('#modalBg').style.display='flex';
+}
+async function savePersonalize(close, forDigest){
+  const kinds=[...document.querySelectorAll('#pKinds .tag.on')].map(t=>t.dataset.k);
+  const goal=$('#pGoal').value.trim();
+  const profile={
+    kinds,
+    skills:$('#pSkills').value.split(',').map(s=>s.trim()).filter(Boolean),
+    locations:$('#pLocs').value.split(',').map(s=>s.trim()).filter(Boolean),
+    goal:goal||undefined
+  };
+  const adj=parseGoalClient(goal);
+  const merged={...profile,...adj};
+  const mergedKinds=[...new Set([...(adj.kinds||[]),...kinds])];
+  if(mergedKinds.length) merged.kinds=mergedKinds;
+  saveProfile(merged);
+  applyProfileRanking(); renderChips(); render();
+  if(forDigest){
+    if(!API){ toast('Digest sync needs served mode'); }
+    else try{
+      const r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({profile:merged})});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      toast('Saved — digest matches this from the next run');
+    }catch(_){ toast('Could not reach server — profile still saved locally'); }
+  } else toast('Personalized ✓ (saved in this browser)');
+  closeModal();
+}
+function resetPersonalize(){ storage.removeItem(PROFILE_KEY); PROFILE=null;
+  applyProfileRanking(); renderChips(); render(); closeModal(); toast('Personalization cleared'); }
+function dismissNudge(){ storage.setItem(NUDGE_KEY,'1'); $('#nudge').style.display='none'; }
+window.openPersonalize=openPersonalize; window.dismissNudge=dismissNudge; window.closeModal=closeModal;
+window.savePersonalize=savePersonalize; window.resetPersonalize=resetPersonalize;
+
+if('serviceWorker' in navigator && window.isSecureContext){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>

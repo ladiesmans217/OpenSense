@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+.credentials.yaml
+node_modules/
+.vscode/
+.zcode/
+data/events.db
