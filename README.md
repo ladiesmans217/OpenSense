@@ -113,7 +113,7 @@ flowchart LR
 | Technical excellence | Schema unification across ~20 heterogeneous layouts, guarded entity resolution, delta engine, Discovery→PDP enrichment, no-login personalization with a deterministic prompt parser, cross-source trend signal, 110 tests. |
 | Use of Scraper Studio | Full lifecycle: `create → run → heal(auto) → approve` + trigger API in CI + batch PDP enrichment. |
 | Reliability / self-healing | Auto-heal loop with event-log guardrails; append-only timeline; partial-failure quarantine; per-source health scores; quality gates. |
-| Presentation | Installable PWA with instant search + sparklines, starred watchlist, lineage modal, 90-second script in `docs/DEMO_SCRIPT.md`. |
+| Presentation | Installable PWA with instant search + sparklines, starred watchlist, lineage modal, GIF demo above the fold. |
 
 ## Quickstart
 
@@ -145,7 +145,6 @@ demo-site/              hostable page to demo the self-heal (break a class, film
 .github/workflows/      cron schedule + manual dispatch, commits data/ back
 n8n/                    optional visual delivery layer (docker-compose)
 docs/SETUP.md           full setup: bdata, tokens, CI, heal demo procedure
-docs/DEMO_SCRIPT.md     the 90-second submission video storyboard
 data/                   latest.json, events.jsonl, state.json (committed = visible history)
 ```
 

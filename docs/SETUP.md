@@ -141,7 +141,7 @@ Collector ID unchanged). The instructions are in the demo-site HTML comments.
 
 - [ ] Public repo, this README, judge-runnable setup (this file)
 - [ ] Example structured output committed (`data/latest.json`)
-- [ ] Demo video ≤ 90s following `docs/DEMO_SCRIPT.md` (claim → timeline → heal → digest)
+- [ ] Demo video ≤ 90s (claim → timeline → heal → digest)
 - [ ] README section: how Scraper Studio is used (the four commands + trigger API in CI)
 - [ ] AI-use disclosure: coding-agent assisted, heal prompts written by us, ranking
       logic understood and explainable line by line

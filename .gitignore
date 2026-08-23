@@ -6,3 +6,8 @@ node_modules/
 .vscode/
 .zcode/
 data/events.db
+
+# private working docs — never pushed (kept local only)
+RESEARCH.md
+docs/DEMO_SCRIPT.md
+docs/VIDEO_SCRIPT.md
