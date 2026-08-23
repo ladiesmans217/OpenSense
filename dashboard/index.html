@@ -56,6 +56,9 @@
         transition:color .15s,border-color .15s,background .15s}
   .chip:hover{color:var(--ink)}
   .chip.on{color:var(--acc);border-color:rgba(92,156,255,.55);background:rgba(92,156,255,.08)}
+  .chip.gear{margin-left:auto;border-color:transparent;background:none;color:var(--faint);font-size:14px;padding:5px 10px}
+  .chip.gear:hover{color:var(--acc)}
+  .chip.gear[data-on]{color:var(--good)}
   .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   #q{flex:1;min-width:170px;max-width:430px;background:var(--panel2);border:1px solid var(--line);
      border-radius:9px;color:var(--ink);padding:7px 13px;font-size:13px;outline:none;transition:border-color .15s}
@@ -116,17 +119,32 @@
   .close:hover{color:var(--ink)}
 
   /* personalize panel */
-  .pgrid{display:grid;gap:14px;margin-top:14px}
+  .pgrid{display:grid;gap:15px;margin-top:16px}
   .pgrid label{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.9px;display:block;margin-bottom:7px;font-weight:600}
+  .pgoal input{font-size:14.5px;padding:10px 13px}
+  .examples{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:9px}
+  .examples>span{font-size:11px;color:var(--faint)}
+  .ex{border:1px dashed var(--line2);background:none;color:var(--dim);border-radius:99px;
+      padding:3px 11px;font-size:12px;cursor:pointer;font-family:inherit;
+      transition:color .15s,border-color .15s}
+  .ex:hover{color:var(--acc);border-color:var(--acc)}
   .tagrow{display:flex;gap:6px;flex-wrap:wrap}
   .tag{border:1px solid var(--line);background:var(--panel2);color:var(--dim);border-radius:99px;
-       padding:4px 12px;font-size:12.5px;cursor:pointer;transition:color .15s,border-color .15s}
-  .tag.on{color:var(--acc);border-color:rgba(92,156,255,.55)}
+       padding:5px 13px;font-size:12.5px;cursor:pointer;font-family:inherit;
+       transition:color .15s,border-color .15s,background .15s}
+  .tag:hover{color:var(--ink)}
+  .tag.on{color:var(--acc);border-color:rgba(92,156,255,.55);background:rgba(92,156,255,.08)}
+  .prow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.prow{grid-template-columns:1fr}}
+  .pfoot{display:flex;align-items:center;gap:8px;margin-top:18px;flex-wrap:wrap}
+  .pfoot .btn{margin-top:0}
+  .btn.text{border:none;background:none;color:var(--faint);margin:0 0 0 auto;padding:8px 10px;font-weight:500}
+  .btn.text:hover{color:var(--bad)}
   input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;
-        color:var(--ink);padding:8px 11px;font-size:13.5px;outline:none}
+        color:var(--ink);padding:8px 11px;font-size:13.5px;outline:none;transition:border-color .15s}
   input[type=text]:focus{border-color:var(--acc)}
   .btn{border:1px solid var(--acc);background:var(--acc);color:#08101f;border-radius:9px;padding:8px 16px;
-       font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;transition:filter .15s}
+       font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;transition:filter .15s;font-family:inherit}
   .btn:hover{filter:brightness(1.08)}
   .btn.ghost{background:none;color:var(--acc);font-weight:500}
   .note{font-size:12px;color:var(--dim);margin-top:8px}
@@ -358,7 +376,8 @@ function applyProfileRanking(){
 function renderChips(){
   const kinds=profileKinds()||[...new Set(LISTINGS.map(l=>l.kind))];
   const all=['all','⭐ starred','⏰ closing',...kinds];
-  $('#chips').innerHTML=all.map(c=>`<button class="chip ${c===FILTER?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
+  $('#chips').innerHTML=all.map(c=>`<button class="chip ${c===FILTER?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')
+    +`<button class="chip gear" onclick="openPersonalize()" title="Personalize"${PROFILE?' data-on="1"':''}>⚙</button>`;
   document.querySelectorAll('.chip[data-c]').forEach(b=>b.onclick=()=>{FILTER=b.dataset.c;renderChips();render();});
 }
 // search + sort controls (debounced so typing stays smooth on phones)
@@ -478,30 +497,47 @@ async function openModal(id){
 }
 function closeModal(){ $('#modalBg').style.display='none'; }
 $('#modalBg').onclick=e=>{if(e.target.id==='modalBg')closeModal()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
 // ── personalize tab ──────────────────────────────────────────────────────────
 function openPersonalize(){
   const p=PROFILE||{};
   const sel=new Set(p.kinds||[]);
-  $('#modal').innerHTML=`<button class="close" onclick="closeModal()">×</button>
-    <h3>⚙️ Personalize</h3>
-    <div class="note">Saved in this browser only — no login. Applies instantly; never expires until you change it here.</div>
+  $('#modal').innerHTML=`<button class="close" onclick="closeModal()" aria-label="Close">×</button>
+    <h3>Personalize</h3>
+    <div class="note">Saved in this browser — no login, never expires until you change it here.</div>
     <div class="pgrid">
+      <div class="pgoal"><label>describe your goal</label>
+        <input type="text" id="pGoal" value="${esc(p.goal||'')}" placeholder="what should the radar surface for you?">
+        <div class="examples"><span>try:</span>
+          <button class="ex" type="button">2nd year, only internships</button>
+          <button class="ex" type="button">competitions that lead to jobs</button>
+          <button class="ex" type="button">remote web dev jobs</button>
+        </div></div>
       <div><label>what are you looking for?</label>
-        <div class="tagrow" id="pKinds">${KINDS.map(k=>`<span class="tag ${sel.has(k)?'on':''}" data-k="${k}">${k}</span>`).join('')}</div></div>
-      <div><label>skills (comma separated)</label>
-        <input type="text" id="pSkills" value="${esc((p.skills||[]).join(', '))}" placeholder="python, react, web scraping"></div>
-      <div><label>locations</label>
-        <input type="text" id="pLocs" value="${esc((p.locations||[]).join(', '))}" placeholder="remote, bangalore, india"></div>
-      <div><label>describe your goal (optional)</label>
-        <input type="text" id="pGoal" value="${esc(p.goal||'')}" placeholder="2nd year, only internships — or: competitions that lead to jobs"></div>
+        <div class="tagrow" id="pKinds">${KINDS.map(k=>`<button type="button" class="tag ${sel.has(k)?'on':''}" data-k="${k}">${k}</button>`).join('')}</div></div>
+      <div class="prow">
+        <div><label>skills</label>
+          <input type="text" id="pSkills" value="${esc((p.skills||[]).join(', '))}" placeholder="python, react, scraping"></div>
+        <div><label>locations</label>
+          <input type="text" id="pLocs" value="${esc((p.locations||[]).join(', '))}" placeholder="remote, bangalore"></div>
+      </div>
     </div>
-    <button class="btn" onclick="savePersonalize(true)">Save</button>
-    <button class="btn ghost" onclick="savePersonalize(true,true)">Save + use for my digest</button>
-    <button class="btn ghost" onclick="resetPersonalize()">Reset</button>
-    <div class="note">"use for my digest" sends this to the server — the next pipeline run's Telegram alert matches it.</div>`;
-  document.querySelectorAll('#pKinds .tag').forEach(t=>t.onclick=()=>{t.classList.toggle('on');});
+    <div class="pfoot">
+      <button class="btn" onclick="savePersonalize(true)">Save</button>
+      <button class="btn ghost" onclick="savePersonalize(true,true)">Save + sync digest</button>
+      <button class="btn text" onclick="resetPersonalize()">Reset</button>
+    </div>
+    <div class="note">“sync digest” sends this to the server — the next run’s Telegram alert matches it.</div>`;
+  document.querySelectorAll('#pKinds .tag').forEach(t=>t.onclick=()=>t.classList.toggle('on'));
+  document.querySelectorAll('.ex').forEach(b=>b.onclick=()=>{
+    $('#pGoal').value=b.textContent.trim(); $('#pGoal').focus();
+  });
+  document.querySelectorAll('#modal input').forEach(i=>i.onkeydown=e=>{
+    if(e.key==='Enter') savePersonalize(true);
+  });
   $('#modalBg').style.display='flex';
+  $('#pGoal').focus();
 }
 async function savePersonalize(close, forDigest){
   const kinds=[...document.querySelectorAll('#pKinds .tag.on')].map(t=>t.dataset.k);
