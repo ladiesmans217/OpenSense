@@ -117,3 +117,57 @@ def test_callback_from_admin_routes(monkeypatch):
         "from": {"id": 7},
         "message": {"chat": {"id": 1}}}})
     assert routed == [2]
+
+
+# ── /remove: exact, smart substring, and ambiguity ──────────────────────────
+
+def _remove_setup(tmp_path, monkeypatch, captured):
+    import pipeline.source_ops as so
+    (tmp_path / "sources.yaml").write_text(
+        "sources:\n  - name: summerofcode-withgoogle-com-internships\n    kind: internship\n"
+        "    collector_id: c_gsoc\n    seed_url: https://summerofcode.withgoogle.com/\n"
+        "  - name: shine-jobs\n    kind: job\n    collector_id: c_shine\n", encoding="utf-8")
+    monkeypatch.setattr(so, "SOURCES_YAML", tmp_path / "sources.yaml")
+    monkeypatch.setattr(so, "git_commit", lambda msg: "test")
+    bot = Bot(token="x", admin_ids={7})
+    bot.send = lambda cid, text, buttons=None, rich=False: \
+        captured.setdefault("m", []).append(text)
+    return bot
+
+
+def test_remove_exact_name_benches(tmp_path, monkeypatch):
+    import pipeline.source_ops as so
+    import yaml
+    captured = {}
+    bot = _remove_setup(tmp_path, monkeypatch, captured)
+    bot.cmd_remove(1, "shine-jobs")
+    assert any("shine-jobs benched" in t for t in captured["m"])
+    assert yaml.safe_load((tmp_path / "sources.yaml").read_text())["sources"][1]["enabled"] is False
+
+
+def test_remove_smart_substring_match(tmp_path, monkeypatch):
+    import yaml
+    captured = {}
+    bot = _remove_setup(tmp_path, monkeypatch, captured)
+    bot.cmd_remove(1, "summerofcode")          # unique substring → benches the long name
+    assert any("summerofcode-withgoogle-com-internships benched" in t for t in captured["m"])
+    assert yaml.safe_load((tmp_path / "sources.yaml").read_text())["sources"][0]["enabled"] is False
+
+
+def test_remove_url_form_matches_kind_suffix(tmp_path, monkeypatch):
+    captured = {}
+    bot = _remove_setup(tmp_path, monkeypatch, captured)
+    bot.cmd_remove(1, "summerofcode.withgoogle.com")   # slug misses '-internships' → fallback hits
+    assert any("summerofcode-withgoogle-com-internships benched" in t for t in captured["m"])
+
+
+def test_remove_unknown_and_ambiguous(tmp_path, monkeypatch):
+    captured = {}
+    bot = _remove_setup(tmp_path, monkeypatch, captured)
+    bot.cmd_remove(1, "gsoc")
+    assert any("no source named" in t for t in captured["m"])
+    (tmp_path / "sources.yaml").write_text(
+        "sources:\n  - name: summerofcode-a-internships\n    collector_id: c_1\n"
+        "  - name: summerofcode-b-internships\n    collector_id: c_2\n", encoding="utf-8")
+    bot.cmd_remove(1, "summerofcode")
+    assert any("ambiguous" in t for t in captured["m"])

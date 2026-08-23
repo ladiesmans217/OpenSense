@@ -324,6 +324,15 @@ class Bot:
             self.send(chat_id, "usage: /remove <name-or-url>")
             return
         name = source_ops._slug(args) if "." in args else args
+        names = source_ops.existing_names()
+        if name not in names:
+            # smart fallback: a unique substring match ("/remove summerofcode")
+            hits = [n for n in names if name.lower() in n.lower()]
+            if len(hits) == 1:
+                name = hits[0]
+            elif hits:
+                self.send(chat_id, "ambiguous — which one?\n" + "\n".join(hits))
+                return
         ok = source_ops.disable_source(name)
         note = source_ops.git_commit(f"control-plane: bench source {name}")
         self.send(chat_id, f"✅ {name} benched (collector + history kept). [{note}]"

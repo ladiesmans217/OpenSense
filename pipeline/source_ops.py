@@ -8,6 +8,7 @@ the network/CLI steps are thin wrappers verified live.
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 from pathlib import Path
 from urllib.parse import urlparse
@@ -228,7 +229,9 @@ def pick_candidates(state: dict, existing: set[str], kind: str | None = None,
 # ── the /add ladder ──────────────────────────────────────────────────────────
 
 def _bdata(*args: str, timeout: int = 1200) -> str:
-    out = subprocess.run(["npx", "-p", "@brightdata/cli", "bdata", *args],
+    # Windows: npx is npx.cmd — resolve the real path or CreateProcess misses it (WinError 2)
+    npx = shutil.which("npx") or "npx"
+    out = subprocess.run([npx, "-p", "@brightdata/cli", "bdata", *args],
                          capture_output=True, text=True, timeout=timeout,
                          shell=False)
     return (out.stdout or "") + (out.stderr or "")

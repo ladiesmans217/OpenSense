@@ -58,7 +58,6 @@ sources:
     kind: job
     type: discovery
     seed_url: https://groww.in/careers
-    enabled: false   # benched via control plane
     collector_id: c_mt45nfcf2ohykf9eoh
     field_map: {title: job_title, url: job_url, location: location}
     verify_not_prebuilt: true
