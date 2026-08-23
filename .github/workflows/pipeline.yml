@@ -1,5 +1,9 @@
 name: radar
 
+concurrency:
+  group: radar-pipeline          # cron + push + manual: never two pipelines at once
+  cancel-in-progress: false      # queue instead — a newer run waits for the current one
+
 on:
   schedule:
     - cron: "0 */6 * * *"      # every 6 hours — the run history below is the reliability evidence
@@ -70,4 +74,6 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add data/ || true
           git commit -m "radar: run $(date -u +%FT%TZ) [skip ci]" || echo "nothing to commit"
+          # if another run committed first, rebase our data on top instead of failing
+          git pull --rebase -X theirs origin main || true
           git push
