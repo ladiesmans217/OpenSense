@@ -15,22 +15,23 @@ schema, and delivers a matched daily digest with deadline countdowns.
 JSON" — it's a replayable timeline where every number traces to the exact collector run that
 produced it.
 
-**Live status (2026-08-22):** **22 live Scraper Studio collectors + 8 public API/RSS feeds** ·
-**500+ unified listings across all six kinds** (jobs · internships · hackathons · events ·
-scholarships · bounties) — a meta-aggregator: the platforms students already use (Internshala,
-Shine, Freshersworld, Buddy4Study, WeMakeScholars, DrivenData, Hasgeek, Unstop, Devpost,
-HackerEarth, Devfolio, MLH, Techgig…) **plus** the long-tail pages nobody indexes, in one
-schema · **6 real self-heals in the event timeline** (Freshworks ×2, detail-collector
-countdown truncation, Kaggle, Foundit selector timeout, Devpost empty-cards) · **auto-heal
-loop** (failure-streak → heal → approve → same Collector ID) · **Discovery→PDP deadline
-enrichment** with relative-countdown parsing · **no-login personalization**
-(browser-persistent profile + free-text goal parser + "win this → job" pathway badges) ·
-installable **PWA** with instant search, deadline/newest sort, trend sparkline, starred
+**Live status (2026-08-23):** **22 live Scraper Studio collectors + 8 public API/RSS feeds** ·
+**591 unified listings across all six kinds** (377 jobs · 69 scholarships · 53 hackathons ·
+52 internships · 26 events · 14 bounties) — a meta-aggregator: the platforms students already
+use (Internshala, Shine, Freshersworld, Buddy4Study, WeMakeScholars, DrivenData, Hasgeek,
+Unstop, Devpost, HackerEarth, Devfolio, MLH, Techgig, the WeMakeDevs board itself…) **plus**
+the long-tail pages nobody indexes, in one schema · **6 real self-heals in the event
+timeline** (Freshworks ×2, detail-collector countdown truncation, Kaggle, Foundit selector
+timeout, Devpost empty-cards) · **auto-heal loop** (failure-streak → error-derived prompt →
+heal → approve → same Collector ID) · **Discovery→PDP deadline enrichment** with
+relative-countdown parsing · **no-login personalization** (browser-persistent profile +
+free-text goal parser + "win this → job" pathway badges) · installable **PWA** with instant
+search, deadline/newest sort, live-updating stats, a cross-source trend sparkline, starred
 watchlist and per-listing lineage · **weekly trend signal** (cross-source week-over-week —
 the line no single-site aggregator can draw) · **deadline bodyguard** (starred listings
-closing ≤3 days ping daily) · 110 tests green in CI ·
-benched sources carry written post-mortems (Zomato, Swiggy, Kaggle, Sitare, Foundit —
-swap-in is a one-line config change).
+closing ≤3 days ping daily until they pass) · **source health scores** (success rate over
+the last 20 runs per source) · **114 tests green in CI** · benched sources carry written
+post-mortems (Zomato, Swiggy, Kaggle, Sitare, Foundit — swap-in is a one-line config change).
 
 ## How Scraper Studio is used (the four commands + everything after)
 
@@ -110,25 +111,46 @@ flowchart LR
 |---|---|
 | Potential impact | Judges are the audience: students/junior devs. Real pain, real users. |
 | Creativity | Not a price tracker. Long-tail opportunity class + event-sourced pipeline. |
-| Technical excellence | Schema unification across ~20 heterogeneous layouts, guarded entity resolution, delta engine, Discovery→PDP enrichment, no-login personalization with a deterministic prompt parser, cross-source trend signal, 110 tests. |
+| Technical excellence | Schema unification across ~20 heterogeneous layouts, guarded entity resolution, delta engine, Discovery→PDP enrichment, no-login personalization with a deterministic prompt parser, cross-source trend signal, 114 tests. |
 | Use of Scraper Studio | Full lifecycle: `create → run → heal(auto) → approve` + trigger API in CI + batch PDP enrichment. |
 | Reliability / self-healing | Auto-heal loop with event-log guardrails; append-only timeline; partial-failure quarantine; per-source health scores; quality gates. |
 | Presentation | Installable PWA with instant search + sparklines, starred watchlist, lineage modal, GIF demo above the fold. |
 
 ## Quickstart
 
+Runs anywhere Python does — developed on Windows, in production on Linux (GitHub Actions).
+The repo ships with the latest run's committed data, so the dashboard is real from the
+first `serve` — no accounts, no scraping, no setup:
+
 ```bash
-# 1. Bright Data: account + promo + API token  → docs/SETUP.md
-# 2. Create collectors (fills collector_id in config/sources.yaml):
-npx -p @brightdata/cli bdata scraper create <url> "title, deadline, url, ..."
-npx -p @brightdata/cli bdata scraper run  <COLLECTOR_ID> <url> --pretty
-# 3. Configure
-cp .env.example .env          # token, Telegram (optional)
-# 4. Run
-pip install -r requirements.txt
-python -m pipeline run
-python -m pipeline serve      # dashboard at http://localhost:8000
+git clone https://github.com/ladiesmans217/OpenSense && cd OpenSense
+pip install -r requirements.txt          # Python 3.11+ (tested on 3.11, 3.12, 3.14)
+
+# ── the 60-second tour — no accounts needed ──────────────────────────────
+python -m pytest -q                      # 114 tests
+python -m pipeline serve                 # dashboard → http://localhost:8000/dashboard/
+python -m pipeline run --dry             # pipeline smoke test (in-memory, writes nothing)
+
+# ── the live radar — needs a Bright Data token ───────────────────────────
+cp .env.example .env                     # add BRIGHTDATA_API_TOKEN (docs/SETUP.md, 5 min)
+python -m pipeline run                   # 22 collectors + 8 feeds → normalize → … → digest
+
+# ── the control plane — optional, from your phone ────────────────────────
+# TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID + TELEGRAM_ADMIN_IDS in .env
+python -m pipeline bot                   # /add /find /suggest /watch /status …
 ```
+
+Adding a source never requires editing YAML by hand: message the bot `/add <url> [kind]`
+and it runs the whole ladder — or use the CLI directly and paste the id into
+`config/sources.yaml`:
+
+```bash
+npx -p @brightdata/cli bdata scraper create <url> "title, deadline, url, …"
+npx -p @brightdata/cli bdata scraper run <COLLECTOR_ID> <url> --pretty
+```
+
+Full setup — Bright Data account, tokens, CI secrets, the heal-demo procedure — is in
+[`docs/SETUP.md`](docs/SETUP.md).
 
 ## Repo map
 
