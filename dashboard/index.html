@@ -207,6 +207,7 @@ const KINDS=['job','internship','hackathon','bounty','scholarship','event'];
 const PROFILE_KEY='opensense.profile.v1';
 
 let LISTINGS=[], STARS=new Set(), FILTER='all', PROFILE=null, QUERY='', SORT='relevance';
+let SUMMARY={}, HEALS=0, ENRICHS=0, LASTTS=null, LAST_GENERATED=null, LASTLOGLEN=0;
 const storage=(()=>{  // localStorage can be unavailable (private mode) — degrade to memory
   try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return localStorage; }
   catch(_){ const m={}; return {getItem:k=>m[k]??null,setItem:(k,v)=>m[k]=String(v),removeItem:k=>delete m[k]}; }
@@ -268,28 +269,48 @@ function parseGoalClient(text){
 }
 function profileKinds(){ return (PROFILE&&PROFILE.kinds&&PROFILE.kinds.length)?PROFILE.kinds:null; }
 
-// ── boot ─────────────────────────────────────────────────────────────────────
-Promise.allSettled([
-  fetchSafe('../data/latest.json'),
-  fetch('../data/events.jsonl',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}),
-  API?fetchSafe('/api/stars'):Promise.resolve({}),
-  API?fetchSafe('/api/trends'):Promise.resolve(null)
-]).then(([dataR, logR, starsR, trendsR])=>{
-  if(dataR.status==='rejected'){ showBanner('Could not load radar data — is the pipeline run yet?'); }
+// ── boot + live refresh ──────────────────────────────────────────────────────
+function renderStats(){
+  const srcs=new Set(LISTINGS.map(l=>String(l.source).split(', ')[0]));
+  $('#cards').innerHTML=[
+    ['live listings',SUMMARY.total_live??LISTINGS.length],
+    ['sources live',srcs.size],
+    ['new since last run',SUMMARY.new??'—'],
+    ['closing this week',SUMMARY.closing_this_week??'—'],
+    ['⭐ starred',LISTINGS.filter(l=>STARS.has(l.id)).length],
+    ['heals / enrich',`${HEALS} / ${ENRICHS}`]
+  ].map(([k,v])=>`<div class="stat"><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join('');
+  $('#runage').textContent=LASTTS?`last run ${age(LASTTS)}`:'';
+}
+
+async function loadAll(first=false){
+  const [dataR, logR, starsR, trendsR]=await Promise.allSettled([
+    fetchSafe('../data/latest.json'),
+    fetch('../data/events.jsonl',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}),
+    API?fetchSafe('/api/stars'):Promise.resolve({}),
+    API?fetchSafe('/api/trends'):Promise.resolve(null)
+  ]);
   const data=dataR.status==='fulfilled'?dataR.value:null;
   const logText=logR.status==='fulfilled'?String(logR.value||''):'';
   const stars=starsR.status==='fulfilled'?starsR.value:{};
-  if(!data&&!logText){ return; }
+  if(!data&&!logText){
+    if(first) showBanner('Could not load radar data — is the pipeline run yet?');
+    return;
+  }
+  // refresh gate: only re-render when the run stamp or the event log actually moved
+  const gen=data&&data.generated;
+  if(!first && gen===LAST_GENERATED && logText.length===LASTLOGLEN) return;
+  LAST_GENERATED=gen??LAST_GENERATED;
+  LASTLOGLEN=logText.length;
+
   STARS=new Set(Object.keys(stars||{}));
   LISTINGS=(data&&data.listings||[]).filter(l=>l&&l.title);   // malformed-row guard
-  loadProfile();
-
+  SUMMARY=(data&&data.summary)||{};
   const evts=parseJsonl(logText);
   const runTs=evts.length?evts[evts.length-1].ts:null;
-  $('#runage').textContent=runTs?`last run ${age(runTs)}`:'';
-  const heals=evts.filter(e=>e.kind==='heal').length, enrichs=evts.filter(e=>e.kind==='enrich').length;
-  const s=(data&&data.summary)||{};
-  const srcs=new Set(LISTINGS.map(l=>String(l.source).split(', ')[0]));
+  if(runTs) LASTTS=runTs;
+  HEALS=evts.filter(e=>e.kind==='heal').length;
+  ENRICHS=evts.filter(e=>e.kind==='enrich').length;
 
   const tr=trendsR.status==='fulfilled'?trendsR.value:null;
   if(tr&&tr.daily){
@@ -298,17 +319,17 @@ Promise.allSettled([
     $('#trend').classList.add('on');
   }
 
-  $('#cards').innerHTML=[
-    ['live listings',s.total_live??LISTINGS.length],
-    ['sources live',srcs.size],
-    ['new since last run',s.new??'—'],
-    ['closing this week',s.closing_this_week??'—'],
-    ['⭐ starred',LISTINGS.filter(l=>STARS.has(l.id)).length],
-    ['heals / enrich',`${heals} / ${enrichs}`]
-  ].map(([k,v])=>`<div class="stat"><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join('');
-
+  const feed=$('.feed'), feedScroll=feed?feed.scrollTop:0;   // keep the reader's place
+  if(first) loadProfile();
+  renderStats();
   applyProfileRanking(); renderChips(); render(); renderFeed(evts);
-}).catch(err=>showBanner('Unexpected init failure: '+err.message));
+  if(feed) feed.scrollTop=feedScroll;
+}
+
+loadAll(true).catch(err=>showBanner('Unexpected init failure: '+err.message));
+// live refresh: poll while the tab is visible; refresh immediately on return
+setInterval(()=>{ if(document.visibilityState==='visible') loadAll(false).catch(()=>{}); }, 180000);
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') loadAll(false).catch(()=>{}); });
 
 function sparkSVG(vals){
   // tiny hand-built sparkline — no libraries, just a polyline scaled into view
@@ -399,6 +420,7 @@ async function toggleStar(id){
     const {starred}=await r.json();
     starred?STARS.add(id):STARS.delete(id);
   }catch(_){ toast('Server unreachable — star saved locally for now'); STARS.add(id); }
+  renderStats();   // the ⭐ count ticks up immediately, no reload
   render();
 }
 function renderFeed(evts){

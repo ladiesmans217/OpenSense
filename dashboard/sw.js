@@ -1,7 +1,7 @@
 /* OpenSense service worker — stale-while-revalidate.
    The shell and the last pipeline data are cached, so the installed PWA opens
    instantly and works offline with the most recent run's numbers. */
-const CACHE = "opensense-v5";
+const CACHE = "opensense-v6";
 const SHELL = [
   "/dashboard/",
   "/dashboard/manifest.webmanifest",
