@@ -1188,3 +1188,62 @@
 {"ts": 1787728145.358, "kind": "delta", "source": null, "status": "ok", "detail": {"new": 61, "removed": 25, "changed": 0, "closing_this_week": 31, "starred_changed": 0, "starred_live": 0, "total_live": 567}}
 {"ts": 1787728145.377, "kind": "alert", "source": null, "status": "ok", "detail": {"channel": "stdout", "chars": 2298, "narrated": false}}
 {"ts": 1787728145.408, "kind": "run_end", "source": null, "status": "ok", "detail": {"new": 61, "removed": 25, "changed": 0, "closing_this_week": 31, "starred_changed": 0, "starred_live": 0, "total_live": 567}}
+{"ts": 1787747944.622, "kind": "run_start", "source": null, "status": "ok", "detail": {"sources": 22, "dry": false}}
+{"ts": 1787747944.628, "kind": "source_trigger", "source": "internshala-internships", "status": "ok", "detail": {"collector_id": "c_mt4fp37e1axygyx76t"}}
+{"ts": 1787747944.631, "kind": "source_trigger", "source": "zoho-careers", "status": "ok", "detail": {"collector_id": "c_mt44uuwj2btvl18f65"}}
+{"ts": 1787747944.632, "kind": "source_trigger", "source": "razorpay-careers", "status": "ok", "detail": {"collector_id": "c_mt44ysz61ycz5f2vgg"}}
+{"ts": 1787747944.631, "kind": "source_trigger", "source": "freshworks-careers", "status": "ok", "detail": {"collector_id": "c_mt44v6e72osr3q6tlr"}}
+{"ts": 1787747978.577, "kind": "source_result", "source": "razorpay-careers", "status": "ok", "detail": {"raw_rows": 24, "normalized": 24}}
+{"ts": 1787747978.58, "kind": "source_trigger", "source": "phonepe-careers", "status": "ok", "detail": {"collector_id": "c_mt45ndoc1zmhp8k0jr"}}
+{"ts": 1787747987.51, "kind": "source_result", "source": "internshala-internships", "status": "ok", "detail": {"raw_rows": 50, "normalized": 50}}
+{"ts": 1787747987.512, "kind": "source_trigger", "source": "groww-careers", "status": "ok", "detail": {"collector_id": "c_mt45nfcf2ohykf9eoh"}}
+{"ts": 1787748017.847, "kind": "source_result", "source": "groww-careers", "status": "ok", "detail": {"raw_rows": 1, "normalized": 5}}
+{"ts": 1787748017.849, "kind": "source_trigger", "source": "postman-careers", "status": "ok", "detail": {"collector_id": "c_mt4b7vlq2mvin7s5l"}}
+{"ts": 1787748072.735, "kind": "source_result", "source": "phonepe-careers", "status": "ok", "detail": {"raw_rows": 63, "normalized": 63}}
+{"ts": 1787748072.737, "kind": "source_trigger", "source": "hasgeek-events", "status": "ok", "detail": {"collector_id": "c_mt4fp6m4xaywsfdex"}}
+{"ts": 1787748078.8, "kind": "source_result", "source": "zoho-careers", "status": "ok", "detail": {"raw_rows": 13, "normalized": 13}}
+{"ts": 1787748078.802, "kind": "source_trigger", "source": "devfolio-hackathons", "status": "ok", "detail": {"collector_id": "c_mt44yunc2kxqt4rkwx"}}
+{"ts": 1787748165.738, "kind": "source_result", "source": "hasgeek-events", "status": "ok", "detail": {"raw_rows": 20, "normalized": 16}}
+{"ts": 1787748165.74, "kind": "source_trigger", "source": "mlh-season-events", "status": "ok", "detail": {"collector_id": "c_mt455hti2c7k6to8za"}}
+{"ts": 1787748196.945, "kind": "source_result", "source": "devfolio-hackathons", "status": "ok", "detail": {"raw_rows": 29, "normalized": 29}}
+{"ts": 1787748196.947, "kind": "source_trigger", "source": "wemakedevs-events", "status": "ok", "detail": {"collector_id": "c_mt455xp5gua7pjsp4"}}
+{"ts": 1787748227.236, "kind": "source_result", "source": "mlh-season-events", "status": "ok", "detail": {"raw_rows": 1, "normalized": 1}}
+{"ts": 1787748227.237, "kind": "source_trigger", "source": "shine-jobs", "status": "ok", "detail": {"collector_id": "c_mt4gouq12hve7kih5s"}}
+{"ts": 1787748247.45, "kind": "source_result", "source": "wemakedevs-events", "status": "ok", "detail": {"raw_rows": 14, "normalized": 9}}
+{"ts": 1787748247.452, "kind": "source_trigger", "source": "freshersworld-jobs", "status": "ok", "detail": {"collector_id": "c_mt4fvivx24u24ikzwu"}}
+{"ts": 1787748252.062, "kind": "source_result", "source": "freshworks-careers", "status": "ok", "detail": {"raw_rows": 4, "normalized": 3}}
+{"ts": 1787748252.064, "kind": "source_trigger", "source": "unstop-hackathons", "status": "ok", "detail": {"collector_id": "c_mt4hyxu317v78e0gmy"}}
+{"ts": 1787748257.719, "kind": "source_result", "source": "freshersworld-jobs", "status": "ok", "detail": {"raw_rows": 1, "normalized": 20}}
+{"ts": 1787748257.721, "kind": "source_trigger", "source": "devpost-hackathons", "status": "ok", "detail": {"collector_id": "c_mt4hyzpph274spp8n"}}
+{"ts": 1787748260.563, "kind": "source_result", "source": "postman-careers", "status": "ok", "detail": {"raw_rows": 122, "normalized": 51}}
+{"ts": 1787748260.564, "kind": "source_trigger", "source": "hackerearth-hackathons", "status": "ok", "detail": {"collector_id": "c_mt4ihxgn1ib96ik622"}}
+{"ts": 1787748270.793, "kind": "source_result", "source": "hackerearth-hackathons", "status": "ok", "detail": {"raw_rows": 1, "normalized": 3}}
+{"ts": 1787748270.795, "kind": "source_trigger", "source": "reskilll-hackathons", "status": "ok", "detail": {"collector_id": "c_mt4g4upg1mks50he5n"}}
+{"ts": 1787748392.722, "kind": "source_result", "source": "unstop-hackathons", "status": "ok", "detail": {"raw_rows": 34, "normalized": 33}}
+{"ts": 1787748392.723, "kind": "source_trigger", "source": "techgig-hackathons", "status": "ok", "detail": {"collector_id": "c_mt4g4wdt2n0kds1jfp"}}
+{"ts": 1787749134.923, "kind": "source_fail", "source": "shine-jobs", "status": "fail", "detail": {"error": "collector c_mt4gouq12hve7kih5s run j_mta34wkfwh4hos1uz not ready in 900s"}}
+{"ts": 1787749134.926, "kind": "source_trigger", "source": "drivendata-competitions", "status": "ok", "detail": {"collector_id": "c_mt4fp8clensybrwop"}}
+{"ts": 1787749161.919, "kind": "source_fail", "source": "devpost-hackathons", "status": "fail", "detail": {"error": "collector c_mt4hyzpph274spp8n run j_mta35k342nllydjpb1 not ready in 900s"}}
+{"ts": 1787749161.922, "kind": "source_trigger", "source": "wemakescholars-scholarships", "status": "ok", "detail": {"collector_id": "c_mt4fwa5len2xgxn1v"}}
+{"ts": 1787749174.986, "kind": "source_fail", "source": "reskilll-hackathons", "status": "fail", "detail": {"error": "collector c_mt4g4upg1mks50he5n run j_mta35u9sfvqlvhauh not ready in 900s"}}
+{"ts": 1787749174.989, "kind": "source_trigger", "source": "buddy4study-scholarships", "status": "ok", "detail": {"collector_id": "c_mt4hdlbl10yxlih3kd"}}
+{"ts": 1787749252.352, "kind": "source_result", "source": "techgig-hackathons", "status": "ok", "detail": {"raw_rows": 14, "normalized": 6}}
+{"ts": 1787749252.354, "kind": "source_trigger", "source": "youthop-opportunities", "status": "ok", "detail": {"collector_id": "c_mt4hdn8b29o71nsf2c"}}
+{"ts": 1787749369.824, "kind": "source_result", "source": "wemakescholars-scholarships", "status": "ok", "detail": {"raw_rows": 0, "normalized": 0}}
+{"ts": 1787749639.079, "kind": "source_result", "source": "youthop-opportunities", "status": "ok", "detail": {"raw_rows": 1, "normalized": 18}}
+{"ts": 1787749849.522, "kind": "source_result", "source": "drivendata-competitions", "status": "ok", "detail": {"raw_rows": 11, "normalized": 11}}
+{"ts": 1787749946.394, "kind": "source_result", "source": "buddy4study-scholarships", "status": "ok", "detail": {"raw_rows": 10, "normalized": 102}}
+{"ts": 1787749946.865, "kind": "source_result", "source": "api:remoteok", "status": "ok", "detail": {"transport": "api", "raw_rows": 99, "normalized": 99}}
+{"ts": 1787749946.925, "kind": "source_result", "source": "api:remotive", "status": "ok", "detail": {"transport": "api", "raw_rows": 18, "normalized": 18}}
+{"ts": 1787749947.376, "kind": "source_result", "source": "api:workingnomads", "status": "ok", "detail": {"transport": "api", "raw_rows": 41, "normalized": 41}}
+{"ts": 1787749947.566, "kind": "source_result", "source": "api:wwr-programming", "status": "ok", "detail": {"transport": "api", "raw_rows": 25, "normalized": 25}}
+{"ts": 1787749947.754, "kind": "source_result", "source": "api:youtube-kunal", "status": "ok", "detail": {"transport": "api", "raw_rows": 4, "normalized": 4}}
+{"ts": 1787749947.919, "kind": "source_result", "source": "api:youtube-apnacollege", "status": "ok", "detail": {"transport": "api", "raw_rows": 7, "normalized": 7}}
+{"ts": 1787749947.961, "kind": "source_result", "source": "api:youtube-codewithharry", "status": "ok", "detail": {"transport": "api", "raw_rows": 0, "normalized": 0}}
+{"ts": 1787749948.115, "kind": "source_result", "source": "api:youtube-striver", "status": "ok", "detail": {"transport": "api", "raw_rows": 3, "normalized": 3}}
+{"ts": 1787749948.964, "kind": "dedup", "source": null, "status": "ok", "detail": {"raw": 650, "unique": 540}}
+{"ts": 1787749948.987, "kind": "enrich", "source": null, "status": "started", "detail": {"targets": 1}}
+{"ts": 1787749989.954, "kind": "enrich", "source": null, "status": "done", "detail": {"targets": 1, "filled": 0}}
+{"ts": 1787749989.959, "kind": "delta", "source": null, "status": "ok", "detail": {"new": 50, "removed": 77, "changed": 0, "closing_this_week": 29, "starred_changed": 0, "starred_live": 0, "total_live": 540}}
+{"ts": 1787749989.976, "kind": "alert", "source": null, "status": "ok", "detail": {"channel": "stdout", "chars": 2140, "narrated": false}}
+{"ts": 1787749990.01, "kind": "run_end", "source": null, "status": "ok", "detail": {"new": 50, "removed": 77, "changed": 0, "closing_this_week": 29, "starred_changed": 0, "starred_live": 0, "total_live": 540}}
